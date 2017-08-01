@@ -1,0 +1,3 @@
+DBCC FREEPROCCACHE
+
+SET IDENTITY_INSERT FYC.Cat_Finanzas_Proveedores   ON
