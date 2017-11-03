@@ -1,0 +1,30 @@
+valores unicos
+
+if object_ID('tempdb..#t') is not null
+		drop table #t
+create table #t   (id int , name  varchar(10) null)
+
+
+
+--alter table #t 
+--add constraint UQ_id UNIQUE (ID);
+
+
+create unique nonclustered index ix_unique_id
+on #t(id) where id is not null;
+
+insert into #t values (1,'jose')
+
+insert into #t values (2,'Emmanuel')
+
+insert into #t values (3,'Nuño')
+
+insert into #t values (null,'Nuño2')
+insert into #t values (null,'Nuño3')
+insert into #t values (3,'Nuño4')
+
+select * from #t
+
+
+if object_ID('tempdb..#t') is not null
+		drop table #t
