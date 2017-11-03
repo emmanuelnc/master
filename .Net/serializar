@@ -1,0 +1,177 @@
+void Main()
+{
+    var ls = new List<ProductosPromo>();
+    ls.Add(new ProductosPromo { Producto = "Hola", Test = 1, persona = new Persona{ Nombre = "pepe"}});
+    ls.Add(new ProductosPromo { Producto = "Hola", Test = 1, persona = new Persona{ Nombre = "pepe"} });
+//  ls.Add(new ProductosPromo { Producto = "Hola", Test = 1, persona = new Persona{ Nombre = "pepe"} });
+//  ls.Add(new ProductosPromo { Producto = "Hola", Test = 1, persona = new Persona{ Nombre = "pepe"} });
+//  ls.Add(new ProductosPromo { Producto = "Hola", Test = 1, persona = new Persona{ Nombre = "pepe"} });
+    
+    XmlConverter.Serialize<List<ProductosPromo>>(ls).Dump();
+}
+
+public class ProductosPromo
+    {
+        public String Producto { get; set; }
+        public int Test {get; set;}
+        public Persona persona {get; set;}
+    }
+    
+public class Persona {
+    public string Nombre  { get; set; }
+}
+
+
+    public class XmlConverter
+    {
+        public static string Serialize<T>(T data)
+        {
+            var x = new System.Xml.Serialization.XmlSerializer(typeof(T));
+            var output = new StringBuilder();
+            var xmlWriterSettings = new XmlWriterSettings()
+            {
+                Indent = true,
+                IndentChars = ("\t"),
+                CloseOutput = true,
+                Encoding = new UTF8Encoding(true),
+                CheckCharacters = true,
+            };
+            XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+            ns.Add("", "");
+            XmlWriter writer = XmlWriter.Create(output, xmlWriterSettings);
+            x.Serialize(writer, data, ns);
+            writer.Close();
+
+            //display the output in LINQPad
+            return output.ToString().Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>", "<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+        }
+
+        public static T Deserialize<T>(byte[] data)
+        {
+            return Deserialize<T>(new MemoryStream(data));
+        }
+
+        public static T Deserialize<T>(string data)
+        {
+            return Deserialize<T>(Encoding.UTF8.GetBytes(data));
+        }
+
+        public static T Deserialize<T>(Stream data)
+        {
+            var serializer = new System.Xml.Serialization.XmlSerializer(typeof(T));
+            return (T)serializer.Deserialize(data);
+        }
+    }
+
+
+[Raul H. Chavez] 
+void Main()
+{
+     var db = this;
+     var dt = db.MtoUsp_Ventas_RecuperarAnticiposPendientes_ByFacturaID(140887,"TENF").AsDynamic().Select(x => new Anticipo {
+         FolioAnticipo = x.FolioAnticipo,
+         UUID = x.UUID,
+         //venta_total = x.venta_total,
+         fecha_documento = x.fecha_documento,
+         serie = x.serie,
+         no_cte = x.no_cte,
+         AnticipoID = x.AnticipoID,
+         AnticipoSerie = x.AnticipoSerie,
+         SaldoDocto = x.SaldoDocto,
+         Valor = 3.00M,
+         //MontoAplicado = x.MontoAplicado
+     })
+     .ToList();
+     
+     dt.Dump();
+     
+     var st = SerializeToXml<List<Anticipo>>(dt);
+     st.Dump();
+     
+     DeserializeFromStream<List<Anticipo>>(System.Text.Encoding.UTF8.GetBytes(st)).Dump();
+}
+
+public class Anticipo {
+     public decimal FolioAnticipo {get; set;}
+     public string UUID {get; set;}
+     //public decimal venta_total {get; set;}
+     public DateTime fecha_documento {get; set;}
+     public string serie {get; set;}
+     public int no_cte {get; set;}
+     
+     public decimal AnticipoID {get; set;}
+     public string AnticipoSerie {get; set;}
+     
+     public decimal SaldoDocto {get; set;}
+     public decimal Valor {get; set;}
+     public decimal MontoAplicado {get; set;}
+}
+
+public string SerializeToXml<T>(T data){
+     var x = new System.Xml.Serialization.XmlSerializer(typeof(T));
+    var output = new StringBuilder();
+    var xmlWriterSettings = new XmlWriterSettings() {
+        Indent = true,
+        IndentChars = ("\t"),
+        CloseOutput = true,
+         Encoding = Encoding.UTF8,
+         CheckCharacters = true,
+    };
+    XmlWriter writer = XmlWriter.Create(output, xmlWriterSettings);
+    x.Serialize(writer, data);
+    writer.Close();
+    
+    //display the output in LINQPad
+    return output.ToString().Replace("<?xml version=\"1.0\" encoding=\"utf-16\"?>","<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+}
+
+public T DeserializeFromStream<T>(byte[] data) {
+     var serializer = new System.Xml.Serialization.XmlSerializer(typeof(T));
+     return (T)serializer.Deserialize(new MemoryStream(data));
+}
+
+// Define other methods and classes here
+
+
+;
+       -- xml to temp table
+       with  xmlnamespaces('http://www.w3.org/2001/XMLSchema-instance' as cfdi)
+       select 
+             pa.Anticipo.value('(FolioAnticipo)[1]', 'int') FolioAnticipo
+             , pa.Anticipo.value('(fecha_documento)[1]', 'date') fecha_documento
+             , pa.Anticipo.value('(UUID)[1]', 'varchar(150)') UUID
+             , pa.Anticipo.value('(SaldoDocto)[1]', 'decimal(18,2)') SaldoDocto
+             , pa.Anticipo.value('(Valor)[1]', 'decimal(18,2)') Valor
+             --, pa.Anticipo.value('(venta_total)[1]', 'decimal(18,2)') venta_total
+             , pa.Anticipo.value('(no_cte)[1]', 'int') no_cte                          
+             --, pa.Anticipo.value('(aplicado_a)[1]', 'int') aplicado_a
+             --, pa.Anticipo.value('(serie_aplicado_a)[1]', 'varchar(6)') serie_aplicado_a          
+             , getdate() as fecha_docto
+             , pa.Anticipo.value('(AnticipoSerie)[1]', 'varchar(7)') serie                    --AnticipoSerie
+             , pa.Anticipo.value('(AnticipoID)[1]', 'int') as no_docto          --AnticipoID
+             , 'N' as tipo_docto
+             , @FacturaSerie as serie_aplicado_a
+             , @FacturaID as aplicado_a
+             , getdate() as fecha_vence_docto 
+             , 17 as concepto
+             , (pa.Anticipo.value('(Valor)[1]', 'decimal(18,2)') * -1)  as monto_1 
+             , 0 as monto_2 
+             , 0 as cxc_terms 
+             , 0 as no_vend 
+             , 'APLICACION' as referencia
+             , @UsuarioID as no_capturista
+             , @Usuario as usuario 
+             , 0 as suc_traspaso
+             , '.' as bandera_Ncredito 
+             , '.' as bandera_Ndev
+             , '.' as bandera_PagoCuadrado
+             , '1900-01-01' as fecha_traspaso 
+             , '.' as bandera_Ncredito2 
+             , '.' as bandera_Ncredito3 
+             , '.' as bandera_Ncredito4 
+             , 0 as porcentaje_impuestos
+             , 0 as FactorAceite
+             into #tempAnticipos
+       from @xml.nodes('/ArrayOfAnticipo') as xm(a)
+       CROSS APPLY xm.a.nodes('Anticipo') as pa(Anticipo)
+
