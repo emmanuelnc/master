@@ -1,0 +1,28 @@
+		declare @comps as xml = '<Relacion>
+			<Padre NoReferencia="6R3Z-10346-DA" ReferenciaID="83">
+			<Componente NoReferencia="F601HD" ReferenciaID="83" />
+			<Componente NoReferencia="F601HD" ReferenciaID="142" />
+			<Componente NoReferencia="FR-6023" ReferenciaID="142" />
+			<Componente NoReferencia="FR6023" ReferenciaID="244" />
+			<Componente NoReferencia="27-215" ReferenciaID="276" />
+			</Padre>
+			<Padre NoReferencia="FD-504" ReferenciaID="244">
+			<Componente NoReferencia="S-819" ReferenciaID="195" />
+			</Padre>
+		</Relacion>'
+		*/
+		/*Obteniendo todos los productos relacionados*/
+			insert into @tblBomPiezas (NoReferencia, ReferenciaID, Padre)
+					select distinct
+						a.b.value('@NoReferencia', 'varchar(200)') Referencia,
+						a.b.value('@ReferenciaID', 'int') ReferenciaID,
+						1 Padre
+					from @comps.nodes('//Relacion/Padre') a(b)
+				union all
+					select distinct
+						a.b.value('@NoReferencia', 'varchar(200)') Referencia,
+						a.b.value('@ReferenciaID', 'int') ReferenciaID,
+						0 Padre
+					from @comps.nodes('//Relacion//Componente') a(b)
+
+  
