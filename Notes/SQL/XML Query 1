@@ -1,0 +1,38 @@
+		/*
+			declare @comps as xml = '<Relacion Tipo="5">
+									<Componente ID="829" AuxID="196" Producto="103980" />
+									<Componente ID="839" AuxID="495" Producto="0001900" />
+									<Componente ID="849" AuxID="0" Producto="303980" />
+									<Componente ID="859" AuxID="0" Producto="003980" />
+									<Componente ID="869" AuxID="0" Producto="503980" />
+									<Componente ID="879" AuxID="845" Producto="003980" />
+									<Componente ID="889" AuxID="695" Producto="703980" />
+							</Relacion>'
+		*/
+
+
+   
+               /*Segmento de validaciones*/
+		Select  @ProdsInexistentes = 
+			stuff((
+				select ', ' + Dt.Producto
+				from
+				(	 Select 	a.b.value('@Producto','varchar(7)') Producto
+						from @comps.nodes('//Relacion/Componente') a(b)) Dt
+				left join  MtoCat_PYO_SistemaInformacionProducto_Producto Prods on Prods.Producto = Dt.Producto
+				where Prods.ProductoID is null
+				for xml path('')
+				) ,1,2,'')
+
+          if LEN(@ProdsInexistentes) > 1
+			begin 
+				set @ProdsInexistentes = 'Existen productos inexistentes en la lista: ' +  @ProdsInexistentes
+				raiserror(@ProdsInexistentes,10,3)
+				return
+			end
+
+           Select @tipo = (
+						 Select 
+						 a.b.value('@Tipo','smallint') Tipo
+						 from @comps.nodes('//Relacion') a(b)
+						 )
