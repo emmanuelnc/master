@@ -1,0 +1,11 @@
+							;
+										with  xmlnamespaces('http://www.sat.gob.mx/cfd/3' as   cfdi,
+																		'http://www.sat.gob.mx/TimbreFiscalDigital' as tfd   )
+
+										select 
+											XMLCFDI.value('(/cfdi:Comprobante/cfdi:Complemento/tfd:TimbreFiscalDigital/@UUID)[1]','varchar(200)') UUID
+										
+										from CXCTRANSAX t with (nolock)
+										join Tra_VYM_Ventas_Factura f with (nolock) on f.Serie = t.serie_aplicado_a and f.FacturaID = t.aplicado_a
+										join Tra_VYM_Ventas_Pedido p with (nolock) on p.PedidoID = f.PedidoID
+										where <filter>
