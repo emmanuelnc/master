@@ -1,0 +1,93 @@
+declare @idoc int
+declare @documento as xml = '
+<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/3" xmlns:pago10="http://www.sat.gob.mx/Pagos" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="3.3" Serie="TENP" Folio="133" Fecha="2017-12-05T16:15:26" Sello="FDt3KqKvuwXJK4n/UBeFOX7zkALL0D5+4HvYXoSBnNv7CjSMIwEgs6FUqmTJ2cxwM25dbq9t9wCIGcmAPq4t0Wc0tQGTOQI6L8uoLAyAeYmsdFwFvnpeBG+xOCKLD1Q3AFK7YfvDDgkn1FCPTcQPN2Z09NwWwBQ1aLd3X/2apst8S5cvOg9BXJw9M56qG4NxVhGCVEStwQMHCqQw53VcUCit7ahBRIGO6IpzbkvcrDqblKwtIfE3hZc9UyEdOgUdR97z5cXOI/VCwqgeuq6tHAp21/zMthyXIITQ9Fo/rzaxeYZUbyCwswxsiuQneM+34n/oCsgJVVDpJJJgG95o/w==" NoCertificado="00001000000407903902" Certificado="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" SubTotal="0" Moneda="XXX" Total="0" TipoDeComprobante="P" LugarExpedicion="45138" xsi:schemaLocation="http://www.sat.gob.mx/cfd/3 http://www.sat.gob.mx/sitio_internet/cfd/3/cfdv33.xsd http://www.sat.gob.mx/Pagos http://www.sat.gob.mx/sitio_internet/cfd/Pagos/Pagos10.xsd">
+	<cfdi:Emisor Rfc="APM8805092U9" Nombre="Auto partes y más S.A. de C.V." RegimenFiscal="601" />
+	<cfdi:Receptor Rfc="HEGF601001VA6" Nombre="HERNANDEZ GARAVITO FRANCISCO JAVIER" UsoCFDI="P01" />
+	<cfdi:Conceptos>
+		<cfdi:Concepto ClaveProdServ="84111506" Cantidad="1" ClaveUnidad="ACT" Descripcion="Pago" ValorUnitario="0" Importe="0" />
+	</cfdi:Conceptos>
+	<cfdi:Complemento>
+		<pago10:Pagos Version="1.0">
+			<pago10:Pago FechaPago="2017-03-07T00:00:00" FormaDePagoP="01" MonedaP="MXN" Monto="3641.45">
+				<pago10:DoctoRelacionado IdDocumento="104D9A77-0DD9-4B97-BCC6-B83C215CA655" Serie="TENF" Folio="140962" MonedaDR="MXN" MetodoDePagoDR="PPD" NumParcialidad="1" ImpSaldoAnt="158.48" ImpPagado="158.48" ImpSaldoInsoluto="0.00" />
+				<pago10:DoctoRelacionado IdDocumento="8E9D1CF4-2CDA-4D93-82E3-2572D04DA52D" Serie="PVAF" Folio="28459" MonedaDR="MXN" MetodoDePagoDR="PPD" NumParcialidad="1" ImpSaldoAnt="465.13" ImpPagado="418.60" ImpSaldoInsoluto="46.53"/>
+			</pago10:Pago>
+			
+			<pago10:Pago FechaPago="2017-03-06T00:00:00" FormaDePagoP="02" MonedaP="MXN" Monto="341.45">
+				<pago10:DoctoRelacionado IdDocumento="80C6E3CB-4656-4DE0-8D1B-59FB9CC0BBD2" Serie="PVAF" Folio="28280" MonedaDR="MXN" MetodoDePagoDR="PPD" NumParcialidad="1" ImpSaldoAnt="265.57" ImpPagado="239.00" ImpSaldoInsoluto="26.57"/>
+			</pago10:Pago>
+			<pago10:Pago FechaPago="2017-03-08T00:00:00" FormaDePagoP="99" MonedaP="MXN" Monto="641.45">
+				<pago10:DoctoRelacionado IdDocumento="283A86CF-EAC2-4AAD-B342-50DDA89857EF" Serie="B" Folio="136428" MonedaDR="MXN" MetodoDePagoDR="PPD" NumParcialidad="1" ImpSaldoAnt="2648.14" ImpPagado="2383.21" ImpSaldoInsoluto="264.93"/>
+				<pago10:DoctoRelacionado IdDocumento="8D6BED9F-5E39-4DC9-A0AE-60CAE0BB037F" Serie="PVAF" Folio="28277" MonedaDR="MXN" MetodoDePagoDR="PPD" NumParcialidad="1" ImpSaldoAnt="2148.62" ImpPagado="759.35" ImpSaldoInsoluto="1389.27"/>
+				<pago10:DoctoRelacionado IdDocumento="8A573D86-25EA-4B7B-9916-650CDFBA5701" Serie="PVAF" Folio="28450" MonedaDR="MXN" MetodoDePagoDR="PPD" NumParcialidad="1" ImpSaldoAnt="54056.50" ImpPagado="54056.50" ImpSaldoInsoluto="0"/>
+			</pago10:Pago>
+		</pago10:Pagos>
+		<tfd:TimbreFiscalDigital xmlns:tfd="http://www.sat.gob.mx/TimbreFiscalDigital" xsi:schemaLocation="http://www.sat.gob.mx/TimbreFiscalDigital http://www.sat.gob.mx/sitio_internet/cfd/TimbreFiscalDigital/TimbreFiscalDigitalv11.xsd" Version="1.1" UUID="9EFA7F9D-D2FA-48FA-B542-D5C0C1D529B0" FechaTimbrado="2017-12-05T16:15:57" RfcProvCertif="SFE0807172W7" SelloCFD="FDt3KqKvuwXJK4n/UBeFOX7zkALL0D5+4HvYXoSBnNv7CjSMIwEgs6FUqmTJ2cxwM25dbq9t9wCIGcmAPq4t0Wc0tQGTOQI6L8uoLAyAeYmsdFwFvnpeBG+xOCKLD1Q3AFK7YfvDDgkn1FCPTcQPN2Z09NwWwBQ1aLd3X/2apst8S5cvOg9BXJw9M56qG4NxVhGCVEStwQMHCqQw53VcUCit7ahBRIGO6IpzbkvcrDqblKwtIfE3hZc9UyEdOgUdR97z5cXOI/VCwqgeuq6tHAp21/zMthyXIITQ9Fo/rzaxeYZUbyCwswxsiuQneM+34n/oCsgJVVDpJJJgG95o/w==" NoCertificadoSAT="20001000000300022779" SelloSAT="MHOQGL3sLg1gR+gUs02pcBx6prc7iphxZQz2ibc2+sv2uoG8L5kANI8nxBCOwDJcsU9nh6Qj8gsUz9hXYEqv9NKzfrTP72hARTaYkFVqfn2x73loAX+w83wyLx9XbV+YisK36lqdtLIpIp8aCXRdrW+f8QD8uVgGyfRq6IphRjcIphu1pjruh01Hy8K9Q5yKTdNlCbbofJPm9IxneRn0qkzJZqWm51B3ITmlM86ErrL/b4pY9mcllFw2FbSwTkDDjxYl006dMIMVERCRt3sB9ylBC9pF0dyxqYQ3RoTMdP6XP58R/KPLLrlT6i5IaBfqpaEuaTrzR3i7Tv8IaVmcOA==" />
+	</cfdi:Complemento>
+</cfdi:Comprobante>
+'
+
+EXEC sp_xml_preparedocument @idoc OUTPUT, @documento ,'<cfdi:Comprobante xmlns:cfdi="http://www.sat.gob.mx/cfd/3" xmlns:pago10="http://www.sat.gob.mx/Pagos" xmlns:tfd="http://www.sat.gob.mx/TimbreFiscalDigital" />'
+
+select *
+	 --Emsr.rfc RFCDF, Emsr.nombre 
+from openxml (@idoc, 'cfdi:Comprobante/cfdi:Emisor')
+with (
+	Rfc varchar(30) 
+	,Nombre varchar(30)
+) Emsr
+
+--select * from openxml (@idoc,'cfdi:Comprobante/cfdi:Complemento/tfd:TimbreFiscalDigital',1)
+cross join openxml (@idoc,'cfdi:Comprobante/cfdi:Complemento/tfd:TimbreFiscalDigital',1)
+	with (
+		  UUID varchar(36)
+		 ,SelloCFD varchar(200)
+		 ,NoCertificadoSAT varchar(200)
+		 ,SelloSAT varchar(500)
+		 ,FechaTimbrado varchar(30)
+		 ,[Version]  varchar(10)
+	) tfd
+
+	cross join openxml (@idoc,'cfdi:Comprobante/cfdi:Receptor',1)
+	with (
+		  Rfc varchar(30)
+		, Nombre varchar(100)
+	) Rcptr
+	cross join openxml (@idoc, 'cfdi:Comprobante',1)    --- OKsssss
+	WITH (  
+		  [Version] varchar(10) 
+		, Serie varchar(10) 
+		, Folio varchar(18)
+		, Fecha varchar(20)
+
+		, TipoDeComprobante varchar(1)
+		, LugarExpedicion varchar(5)
+	)Cmpte
+	cross join openxml (@idoc, 'cfdi:Comprobante/cfdi:Conceptos/cfdi:Concepto',1)
+	with (
+		Cantidad varchar(1) 
+		,ClaveUnidad varchar(3) 
+		,ClaveProdServ varchar(10) 
+		, Descripcion varchar(100) 
+		, ValorUnitario varchar(20) 
+		, Importe varchar(20)
+
+	) cpto
+	cross join openxml (@idoc, 'cfdi:Comprobante/cfdi:Complemento/pago10:Pagos/pago10:Pago',1)
+	with (
+		 FormaDePagoP varchar(3) 
+		 ,Monto varchar(15)
+		 ,FechaPago date
+	) pgo
+	cross join openxml (@idoc, 'cfdi:Comprobante/cfdi:Complemento/pago10:Pagos/pago10:Pago/pago10:DoctoRelacionado',1)
+	with (
+		 IdDocumento varchar(36) 
+		 ,Serie varchar(4)
+		 ,Folio varchar(10)
+		 ,Monto varchar(15)
+		 
+		 ,NumParcialidad int
+		 ,ImpSaldoAnt decimal(9,2)
+		 ,ImpPagado decimal(9,2)
+		 ,ImpSaldoInsoluto decimal(9,2)
+	) doctosRel
