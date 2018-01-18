@@ -1,0 +1,4 @@
+/*arrastra valores de columnas anteriores */
+select *, SUM(peso) over ( partition by Grupo order by ID  ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) Accum
+from Tabla
+
