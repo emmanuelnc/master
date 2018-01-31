@@ -53,3 +53,16 @@ SELECT  C.D.value('../@NoReferencia', 'varchar(50)') pRef
 	, C.D.value('@ReferenciaID', 'int')cRefID
 FROM (SELECT @comps a) B 
 CROSS APPLY B.a.nodes('Relacion/Padre/Componente') C (D)
+
+
+
+declare @xml as xml 
+set @xml = '...'	
+;WITH XMLNAMESPACES('http://www.sat.gob.mx/cfd/3' AS cfdi, 'http://www.sat.gob.mx/TimbreFiscalDigital' AS tfd)
+
+select 
+	co.Comprobante.value('(cfdi:Impuestos/@TotalImpuestosTrasladados)[1]','Decimal(12,2)') TotalTransladado
+	,ISNULL( co.Comprobante.value('(cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado[@Impuesto="001"]/@Importe)[1]','Decimal(12,2)') ,0) ISR
+	,ISNULL( co.Comprobante.value('(cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado[@Impuesto="002"]/@Importe)[1]','Decimal(12,2)') ,0) IVA
+	,ISNULL( co.Comprobante.value('(cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado[@Impuesto="003"]/@Importe)[1]','Decimal(12,2)') ,0) IEPS
+from @xml.nodes('cfdi:Comprobante') co(Comprobante)
