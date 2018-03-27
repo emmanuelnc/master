@@ -1,1 +1,89 @@
 
+/*Pines de entrada por cada boton*/
+const int buttonPin1 = 1;   
+const int buttonPin2 = 2;   
+
+/* Salida de señal a nuestro relay e led indicando el status */
+const int SignalPin1 = 11; 
+const int SignalPin2 = 12; 
+
+
+// Variables will change:
+int buttonPressed;
+int Pin1State = LOW;
+int Pin2State = LOW;
+
+int buttonState;             // the current reading from the input pin
+int lastButtonState = LOW;   // the previous reading from the input pin
+
+// the following variables are unsigned longs because the time, measured in
+// milliseconds, will quickly become a bigger number than can be stored in an int.
+unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
+unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
+
+void setup() {
+	
+  pinMode(buttonPin1, INPUT);
+  pinMode(buttonPin2, INPUT);
+  
+  pinMode(SignalPin1, OUTPUT);
+  pinMode(SignalPin1, OUTPUT);
+
+  // set initial TEST
+  digitalWrite(SignalPin1, HIGH);
+  delay(1000);
+  digitalWrite(SignalPin1, LOW);
+  delay(500);
+  digitalWrite(SignalPin2, HIGH);
+  delay(1000);
+  digitalWrite(SignalPin2, LOW);
+  delay(500);
+  digitalWrite(SignalPin1, HIGH);
+  digitalWrite(SignalPin2, HIGH);
+  delay(1000);
+  digitalWrite(SignalPin1, LOW);
+  digitalWrite(SignalPin2, LOW);
+  
+}
+
+void loop() {
+	
+	
+	
+	int reading = digitalRead(buttonPin1);
+
+	if (reading == HIGH){
+		buttonPressed = buttonPin1;
+	}else{
+		reading = digitalRead(buttonPin2);
+		buttonPressed = buttonPin2;
+	}
+	
+	  // If the switch changed, due to noise or pressing:
+	  if (reading != lastButtonState) {
+		// reset the debouncing timer
+		lastDebounceTime = millis();
+	  }
+	  
+	  if ((millis() - lastDebounceTime) > debounceDelay) {
+		 if (reading != buttonState) {
+			 buttonState = reading;
+			 
+			 if (buttonPressed == buttonPin1 && buttonState == HIGH )
+			 {
+				 Pin1State = !Pin1State;
+				 //Acciones a ejecutar con debounce
+			 }else{
+				 if (buttonPressed == buttonPin2 && buttonState == HIGH )
+				 {
+					 Pin2State = !Pin2State;
+					 //Acciones a ejecutar con debounce
+				 }
+			 }
+				 
+		 }			 
+	  }
+	  digitalWrite(SignalPin1, Pin1State);
+	  digitalWrite(SignalPin2, Pin2State);
+	  lastButtonState = reading;
+}
