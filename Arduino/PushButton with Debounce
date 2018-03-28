@@ -1,10 +1,14 @@
-
 /*Pines de entrada por cada boton*/
-const int buttonPin1 = 1;   
-const int buttonPin2 = 2;   
+const int buttonPin1 = 2;   
+const int buttonPin2 = 3;   
+const int buttonPinLDR = 5;   
+const int LDRSensor = 6;
+
+const int buttonCount = 3;
+int myPins[3]= {buttonPin1,buttonPin2,buttonPinLDR};
 
 /* Salida de señal a nuestro relay e led indicando el status */
-const int SignalPin1 = 11; 
+const int SignalPin1 = 13; 
 const int SignalPin2 = 12; 
 
 
@@ -13,77 +17,129 @@ int buttonPressed;
 int Pin1State = LOW;
 int Pin2State = LOW;
 
+bool LDRActivate = false;
 int buttonState;             // the current reading from the input pin
 int lastButtonState = LOW;   // the previous reading from the input pin
-
-// the following variables are unsigned longs because the time, measured in
-// milliseconds, will quickly become a bigger number than can be stored in an int.
 unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
+unsigned long LDRinitTime = 0;  // the last time the output pin was toggled
+
 unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
+int LDRONDelay = 30 ; // Minutos - segundos - Milis
+int LDROnTime = 2;  
 
 void setup() {
-	
-  pinMode(buttonPin1, INPUT);
-  pinMode(buttonPin2, INPUT);
-  
-  pinMode(SignalPin1, OUTPUT);
-  pinMode(SignalPin1, OUTPUT);
 
-  // set initial TEST
-  digitalWrite(SignalPin1, HIGH);
-  delay(1000);
-  digitalWrite(SignalPin1, LOW);
-  delay(500);
-  digitalWrite(SignalPin2, HIGH);
-  delay(1000);
-  digitalWrite(SignalPin2, LOW);
-  delay(500);
-  digitalWrite(SignalPin1, HIGH);
-  digitalWrite(SignalPin2, HIGH);
-  delay(1000);
-  digitalWrite(SignalPin1, LOW);
-  digitalWrite(SignalPin2, LOW);
-  
+
+ 
+/*Recorremos con el array de los botones de entrada y los inicializamos*/
+for(int i = 0; i < buttonCount;i++){
+ pinMode(myPins[i], INPUT_PULLUP);
+ }
+ 
+pinMode(LDRSensor, INPUT_PULLUP);
+
+ 
+  pinMode(SignalPin1, OUTPUT);
+  pinMode(SignalPin2, OUTPUT);
+  Serial.begin(9600);
+  InitialTest();
+ 
 }
 
 void loop() {
-	
-	
-	
-	int reading = digitalRead(buttonPin1);
+  buttonPressed = 0;
+  
+ int reading;
+/*Recorremos todos los bonotes de entrada para ver cual se preciono*/
 
-	if (reading == HIGH){
-		buttonPressed = buttonPin1;
-	}else{
-		reading = digitalRead(buttonPin2);
-		buttonPressed = buttonPin2;
-	}
-	
-	  // If the switch changed, due to noise or pressing:
-	  if (reading != lastButtonState) {
-		// reset the debouncing timer
-		lastDebounceTime = millis();
-	  }
-	  
-	  if ((millis() - lastDebounceTime) > debounceDelay) {
-		 if (reading != buttonState) {
-			 buttonState = reading;
-			 
-			 if (buttonPressed == buttonPin1 && buttonState == HIGH )
-			 {
-				 Pin1State = !Pin1State;
-				 //Acciones a ejecutar con debounce
-			 }else{
-				 if (buttonPressed == buttonPin2 && buttonState == HIGH )
-				 {
-					 Pin2State = !Pin2State;
-					 //Acciones a ejecutar con debounce
-				 }
-			 }
-				 
-		 }			 
-	  }
-	  digitalWrite(SignalPin1, Pin1State);
-	  digitalWrite(SignalPin2, Pin2State);
-	  lastButtonState = reading;
+for(int i = 0; i < buttonCount;i++){
+    reading = digitalRead(myPins[i]);
+     if (reading == LOW){
+         buttonPressed = myPins[i];
+         i = buttonCount;
+     }
+ }
+
+//if (buttonPressed > 0 )
+//{
+ //  LDRActivate =false;
+ Serial.println( buttonPressed);
+     if (reading != lastButtonState) {
+        lastDebounceTime = millis();
+      }
+
+ Serial.println(  (millis() - lastDebounceTime) > debounceDelay );
+      if ((millis() - lastDebounceTime) > debounceDelay) {
+          
+         if (reading != buttonState) {
+           buttonState = reading;
+Serial.println("other button") ;
+           
+           if(buttonState == LOW){
+              if (buttonPressed == buttonPin1  ) {
+                   Pin1State = !Pin1State;
+                   LDRActivate =false;
+               }else if (buttonPressed == buttonPin2  )  {
+                         Pin2State = !Pin2State;
+                         LDRActivate =false;
+                         }
+                       else if (buttonPressed == buttonPinLDR  )  {
+                        /*Se activa el LDR*/
+                        LDRActivate = !LDRActivate;
+                        Pin1State = LOW;
+                        Pin2State = LOW;
+                 
+                        Serial.print("LDR Activated") ;
+                       }
+                     
+            }
+                 
+         }       
+      }
+
+//}
+/*
+else if (LDRActivate){
+   Serial.println("LDR") ;
+        int ldrreading =  digitalRead(LDRSensor);
+        if ( ldrreading == LOW){
+        Serial.println("NIGTH") ;
+            if (lastDebounceTime ==0){
+              LDRinitTime = millis() ;
+            }
+          
+              /*Validar el statud del LDR* /
+             if ((millis() - LDRinitTime) > (LDRONDelay  * 1000) &&  (millis() - LDRinitTime ) < (LDROnTime  * 1000)  ) {
+              Pin1State = HIGH;
+              
+             } else
+             Pin1State = LOW;  
+        }else {
+        LDRinitTime = 0;
+        Serial.println("DAY") ;
+        Pin1State = LOW;  
+        }
 }
+
+*/
+  digitalWrite(SignalPin1, Pin1State);
+  digitalWrite(SignalPin2, Pin2State);
+  
+ lastButtonState = reading;  
+}
+
+void InitialTest(){
+  digitalWrite(SignalPin1, HIGH);
+  delay(500);
+  digitalWrite(SignalPin1, LOW);
+  delay(250);
+  digitalWrite(SignalPin2, HIGH);
+  delay(500);
+  digitalWrite(SignalPin2, LOW);
+  delay(250);
+  digitalWrite(SignalPin1, HIGH);
+  digitalWrite(SignalPin2, HIGH);
+  delay(500);
+  digitalWrite(SignalPin1, LOW);
+  digitalWrite(SignalPin2, LOW);
+  }
