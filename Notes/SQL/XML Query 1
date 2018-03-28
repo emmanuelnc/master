@@ -1,4 +1,15 @@
-		/*
+/*
+
+select 
+Solicitud.query('PoolServicios/Servicio/Deposito/FechaDeposito/text()') Nombre
+,Solicitud.value('(/PoolServicios/Servicio/Deposito/Banco/@CuentaID)[1]','varchar(20)') Folio
+from fyc.Tra_CXC_PoolServicios_Servicios
+where  Folio = 10
+
+
+*/
+
+/*
 			declare @comps as xml = '<Relacion Tipo="5">
 									<Componente ID="829" AuxID="196" Producto="103980" />
 									<Componente ID="839" AuxID="495" Producto="0001900" />
