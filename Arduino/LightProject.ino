@@ -29,115 +29,131 @@ unsigned long LDRStartTime = 0;  // the last time the output pin was toggled
 unsigned long LDREndTime = 0;  // the last time the output pin was toggled
 
 unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
-int LDRONDelay = 30 ; // Minutos - segundos - Milis
-int LDROnTime = 2;  
+int LDRONDelay = 5 ; 
+int LDROnTime = 5;
 
 void setup() {
-
-
- 
 /*Recorremos con el array de los botones de entrada y los inicializamos*/
 for(int i = 0; i < buttonCount;i++){
  pinMode(myPins[i], INPUT_PULLUP);
  }
- 
-//pinMode(LDRSensor, INPUT_PULLUP);
 
- 
+//pinMode(LDRSensor, INPUT_PULLUP);
   pinMode(SignalPin1, OUTPUT);
   pinMode(SignalPin2, OUTPUT);
   Serial.begin(9600);
   InitialTest();
  
 }
-
 void loop() {
-  
   
  int reading;
 /*Recorremos todos los bonotes de entrada para ver cual se preciono*/
 
-for(int i = 0; i < buttonCount;i++){
-    reading = digitalRead(myPins[i]);
-     if (reading == LOW){
-         buttonPressed = myPins[i];
-         i = buttonCount;// esto es para hacer el exit
-     }
- }
+    for(int i = 0; i < buttonCount;i++){
+        reading = digitalRead(myPins[i]);
+         if (reading == LOW){
+               buttonPressed = myPins[i];
+               i = buttonCount;// esto es para hacer el exit
+             }
+        }  
 
-//if (buttonPressed > 0 )
-//{
- //  LDRActive =false;
- //Serial.println( buttonPressed);
- 
- 
+if (LDRActive = true && lastButtonState == LOW) LDRActive = false;
+
+        
      if (reading != lastButtonState || buttonPressed != lastbuttonPressed ) {
         lastDebounceTime = millis(); // Si hay una variacion se reinicia contador para debounce
-      }
-      if ((millis() - lastDebounceTime) > debounceDelay) {	 // Si ya paso el tiempo de debounce, se toma valor actual del boton presionado
-          
-			 if (LDRActive && buttonPressed == LDRSensor) {
-				 if (reading != LDRSensorState){
-					 LDRSensorState = reading; // Cambio el estado del sensor LDR
-					 if (LDRSensorState == LOW){ // Se activo el ldr por la noche
-						Serial.println("NIGTH") ;
-						LDRStartTime = millis() + (LDRONDelay  * 1000) ;
-						LDREndTime = LDRStartTime + (LDRONDelay  * 1000) ;
-					 }
-					 else{
-						 Serial.println("DAY") ;
-						 LDRStartTime = 0;
-						 
-					 }
-					 
-				 }
-				 
-				 if(LDRStartTime>0 && (LDRStartTime > millis() && LDREndTime < millis() ) ){
-					 Pin1State = HIGH;
-				 }
-				 else{
-					 Pin1State = LOW;
-				 }
-				 
-			 }
-				 else
-				 {
-					 if (reading != buttonState) { // ha cambiado el estado del boton a el último estado esto sera para todo excepto el sensor ldr
-							   buttonState = reading;
-							   
-							   if(buttonState == LOW){
-								  if (buttonPressed == buttonPin1  ) { // Button 1 Pushed
-									   Pin1State = !Pin1State;
-									   LDRActive =false;
-									}
-								  else 
-								  if (buttonPressed == buttonPin2  )  { // Button 2 Pushed
-										 Pin2State = !Pin2State;
-										 LDRActive =false;
-								   }
-								  else 
-								  if (buttonPressed == buttonPinLDR  )  { // LDR Button pushed -> LDR flag activation
-										LDRActive = !LDRActive;
-										Pin1State = LOW;
-										Pin2State = LOW;
-										Serial.print("LDR Activated") ;
-								  }
-								  else
-									if (LDRActive && buttonPressed == LDRSensor )  { // Señal del sensor LDR
-									}
-								}
-							 
-						}   
-				 }				
-			}
+      //  Serial.println(buttonPressed);
+        }
+
+
+     if ((millis() - lastDebounceTime) > debounceDelay) {   // Si ya paso el tiempo de debounce, se toma valor actual del boton presionado
+
+        
+        
+         if (LDRActive && buttonPressed == LDRSensor) {
+        
+                 if (reading != LDRSensorState){
+                     LDRSensorState = reading; // Cambio el estado del sensor LDR
+                     if (LDRSensorState == LOW){ // Se activo el ldr por la noche
+                          Serial.println("NIGTH") ;
+                          LDRStartTime = millis() + (LDRONDelay  * 1000) ;
+                          LDREndTime = LDRStartTime + (LDRONDelay  * 1000) ;
+                     }
+                   else{
+                       Serial.println("DAY") ;
+                       LDRStartTime = 0;
+                      }
+                   
+                 }
+Serial.println((String)LDRStartTime + "/" + (String) millis() ) ;
+                 
+                 if(LDRStartTime>0 && ( millis()> LDRStartTime  &&  millis() < LDREndTime   ) ){
+                //  Serial.println("On");
+                    Pin1State = HIGH;
+                 }
+                 else{
+                    // Serial.println("Off");
+                     Pin1State = LOW;
+                 }
+            
+             }
+
+
+              else
+        {
+           if (reading != buttonState) { // ha cambiado el estado del boton a el último estado esto sera para todo excepto el sensor ldr
+                 buttonState = reading;
+                 
+                 if(buttonState == LOW){
+                  if (buttonPressed == buttonPin1  ) { // Button 1 Pushed
+                     Pin1State = !Pin1State;
+                     LDRActive =false;
+                  }
+                  else 
+                  if (buttonPressed == buttonPin2  )  { // Button 2 Pushed
+                     Pin2State = !Pin2State;
+                     LDRActive =false;
+                   }
+                  else 
+                  if (buttonPressed == buttonPinLDR  )  { // LDR Button pushed -> LDR flag activation
+                    LDRActive = !LDRActive;
+                    Pin1State = LOW;
+                    Pin2State = LOW;
+                    if (LDRActive)
+                    Serial.println("LDR Activated") ;
+                    else
+                    Serial.println("LDR Deactivated") ;
+                  }
+                  else
+                  if (LDRActive && buttonPressed == LDRSensor )  { // Señal del sensor LDR
+                  }
+                }
+               
+            }   
+         
+
+        }
+
+
+
+
+
+
+             
+             
+             
+     }
+
+digitalWrite(SignalPin1, Pin1State);
+digitalWrite(SignalPin2, Pin2State);
+
+lastButtonState = reading;  
+lastbuttonPressed = buttonPressed;
+
 
 }
-  digitalWrite(SignalPin1, Pin1State);
-  digitalWrite(SignalPin2, Pin2State);
-  
- lastButtonState = reading;  
- lastbuttonPressed = buttonPressed;
-}
+
 
 void InitialTest(){
   digitalWrite(SignalPin1, HIGH);
