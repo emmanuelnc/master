@@ -1,0 +1,16 @@
+string transfpath =  @"C:\Desarrollos\2013\Exodus-branch\Exodus\ExodusSucursales_DLL\SatCfdi33\cadenaoriginal_3_3.xslt" ;
+string transfpath2 = @"C:\Desarrollos\2013\Exodus-branch\Exodus\ExodusProfesional2013\SAT\cadenaoriginal_3_3.xslt";
+
+
+XmlDocument doc  = new XmlDocument();
+doc.Load(@"C:\Users\jnuno\Desktop\SAT\2013_tmp146D.xml");
+
+XslCompiledTransform myXslTrans = new XslCompiledTransform();
+myXslTrans.Load(transfpath2);
+StringWriter stw  = new StringWriter();
+XmlTextWriter mywriter = new XmlTextWriter(stw);
+myXslTrans.Transform(doc,null,mywriter);
+stw.ToString().Dump();
+
+
+
