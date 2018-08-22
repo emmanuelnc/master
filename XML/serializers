@@ -14,3 +14,100 @@ stw.ToString().Dump();
 
 
 
+=================================================================================================================================
+void Main()
+{
+	StringWriter xw = new StringWriter();
+
+     XslCompiledTransform transformador = new XslCompiledTransform();
+     transformador.Load(@"C:\Timbrado\cadenaoriginal_3_3.xslt");  //(@"C:\Timbrado\cadenaoriginal_3_2.xslt"
+     
+     
+     var xml = new XmlDocument();
+     xml.Load(@"C:\Timbrado\myXML.xml");
+//	 xml.InnerXml.Dump();
+	 var nodereader = new XmlNodeReader(xml);
+     transformador.Transform(nodereader, null, xw);
+     xw.Dump();
+//     
+//     EncriptarTexto(xw.ToString(), enumAlgoritmoEncriptacion.SHA256withRSA).Dump();
+              
+}
+
+public enum enumAlgoritmoEncriptacion {
+        SHA1withRSA,
+        MD5withRSA,
+        MD5withRSAEncryption,
+        SHA256withRSA
+    }
+
+
+public static string EncriptarTexto(string Texto, enumAlgoritmoEncriptacion Algoritmo)
+{
+
+    ISigner Encriptador = null;
+    byte[] TextoBytes = null;
+    string TextoEncriptado = "";
+     
+     PemReader RdrPEM = new PemReader(new StringReader(@"-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEAk0TQ63sBvPv0/vY2akigb+QsbeK/m5dpK7IwesE/J+ZKhCp1
+gCY7vZesYkaAarzzB9cmp1llNn4CGYkreJO8JILHyo58lQtUVL44L/ZQ6p8uuPGS
+u5iZvLNlQ+kzAY+vWqz5pXPUAcY6/4iLYMsusuWrAVyisO/XkE6Ow5T4RIQBAaSt
+Q9P1WdnuLANebLGdqfLfv4lIhj5koRZCscq6oBZR7Myx6B37AwoRGteaAXnawKjG
+CiBzT6NyUDyelKKsGSSuo34I/WDaEK3Y22aHfsQqJ91nYEfZDM8P98ZtRRTt13Yd
+8UO0S8cQsPsP1t2OCclBlkgkn4QheKXYbXE9QwIDAQABAoIBAC1+I5+qpvXPS3Z7
+boHUn6MQ9FyZoCEbW8TAzdMN4UmdDUXYq+WDag7+TKUrLD5M0jKI1wr5RZfYwyNK
+SWB9GrCYqck7zOZp0oo/HLJMP+DKfa9qCK7kzBELxet9nWENFtlG9/ORXVuS9eS8
+NHoZKfrfkbzg9ez8mjWc3uMyIKNhPzWYy0PPLc1BPTwcsGd0d8PwsoVCRKCqT+pS
+9UiMpK2z+vOMvAXk1iU3SXURXLOUrvNw6ybKAH9IDTyU+TaNNAWxjzV8IxasQBKt
+/WokhYY7T6u9t+fTKQNatuaYp0SdFR7J24qIUbI2KT+nHbQNw3vcKlhOYBzf9ZkJ
+PaYoqskCgYEA1l2LbEskbgLyHXrheWRiBOd48xoopFZjVenFGTjhHAkW3Gtst8Tu
+O5278mz8YBnlKXjlohdKhMOH6LZrXvLElxSMowRk0ybX2EksFv5LzxrhT8vU0DmX
+zA/aQvMpmThyF4nq79wEujO53JgOOXPw+WLQgl4T3ysBGLiqZtazGA8CgYEAr98p
+8nNMr9YTpknZJBEDKr3+eiUr6ajyJxm1y/FYbPQVMAoFlSvJdgC+8YtWZ646/n1d
+0gZR4B2bln2ncktoX9Cj+JCT2Qz7DmmkOgQG2+nTOZBUKXkrvAcWosrHkgngATwR
+hHGu9YJ8tv03EoL/tLZaQC5RuqWPr5of9D7eM40CgYEAgXFfPXdqehvBQ9ftyzW4
+kqmLuZB0NjgMJ9bPs9lK5Xj/mv4rWhTKnqky0sLI6ub4IEDmuShDUUQZD4cH8v+5
+gllgSxfeIjr0X6BfxUqtUFQ09dBpo4sDhK+V5pOa7PDOxDP97/T1zdJqSzBudnby
+bkUjD3XrnfkD4n+wNgUzhDUCgYAxPC13FXYzh5/qnqPuZ+DWF2hlc4COomBgN99g
+H8mcftxrnXKgpyh4I49Q+awPzIPxeNFKGcDUGBXVlInLAndO048D6B2r1ul1yHdU
+UopFCHm8lL4q+iQXOHjKzDAAn0kZr2JMDLNpQcV+SPcg9JF3WtF7RDxXH0BRbbli
+XDNChQKBgEGTZb5tpKZiKGRM5TZILr5iRSpYCIixhBi4nW5tZhT5mwsoBOCIKG2d
+NuCGKQcTulV9AlmS7IK2kEUco+vb2d/2YwpjZLpB/k/3n+v0bIS0xim0HPrIgmg0
+q99+vhQ0788ZQO9XMJ9PRL1zO7g/WDQZb7xO0Cm26C668D9pDg8e
+-----END RSA PRIVATE KEY-----"));
+    AsymmetricCipherKeyPair Obj = (AsymmetricCipherKeyPair)RdrPEM.ReadObject();
+    var _PrivateKey = (RsaKeyParameters)(Obj.Private);
+                        
+    try
+    {
+        switch (Algoritmo)
+        {
+              case enumAlgoritmoEncriptacion.MD5withRSAEncryption:
+                  Encriptador = SignerUtilities.GetSigner("MD5withRSAEncryption");
+                   break;
+              case enumAlgoritmoEncriptacion.MD5withRSA:
+                  Encriptador = SignerUtilities.GetSigner("MD5WithRSA");
+                   break;
+              case enumAlgoritmoEncriptacion.SHA1withRSA:
+                  Encriptador = SignerUtilities.GetSigner("SHA-1WithRSA");
+                   break;
+              case enumAlgoritmoEncriptacion.SHA256withRSA:
+                  Encriptador = SignerUtilities.GetSigner("SHA-256WithRSA");
+                   break;
+        }
+
+        Encriptador.Init(true, _PrivateKey);
+        TextoBytes = System.Text.Encoding.UTF8.GetBytes(Texto);
+        Encriptador.BlockUpdate(TextoBytes, 0, TextoBytes.Length);
+        TextoBytes = Encriptador.GenerateSignature();
+        TextoEncriptado = Convert.ToBase64String(TextoBytes);
+        return TextoEncriptado;
+    }
+    catch (Exception ex)
+    {
+        throw ex;
+    }
+}
+
+============================================================================================================
