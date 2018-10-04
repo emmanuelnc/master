@@ -1,0 +1,95 @@
+/*
+
+==================================================
+
+  Autor :        <José Emmanuel Nuño Cisneros>
+
+  Creación :     <>
+
+  Descripcion :  <Descripcion>
+
+==================================================
+
+*/
+
+create procedure des.Usp_XXX
+
+  @p1 int = 0 
+
+as
+
+       begin
+
+             set nocount on;
+
+             set xact_abort on;
+
+             set transaction isolation level serializable;
+
+      
+
+             /*Bloque de control de errores*/
+
+             begin try
+
+  
+
+          /*Segmento de validaciones*/
+
+          if @x = 0
+
+                 begin
+
+                       raiserror('',10,3)
+
+                       return
+
+                 end
+
+ 
+
+          /*Segmento de transacciones del procedimiento almacenado*/
+
+          begin tran                                              
+
+                  
+
+          commit tran
+
+          raiserror('',10,1)
+
+                                                     
+
+             end try
+
+                                              
+
+             /* Comprobación del estado de confirmación de transacciones*/
+
+             begin catch
+
+          declare @Error varchar(max)
+
+          declare @ErrorID int
+
+                    set @Error = Error_Message()
+
+                    set @ErrorID = error_number()
+
+ 
+
+          if XACT_STATE() = -1
+
+              rollback tran
+
+ 
+
+                      exec dbo.MtoUsp_SIS_Configuracion_Mensaje @ErrorID, @Error
+
+ 
+
+                      end catch
+
+                                              
+
+       end
