@@ -1,0 +1,60 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using ConsumoWCFTest.MyService;
+using System.Data.SqlClient;
+using System.Configuration;
+
+using Dapper;
+
+using System.Data;
+
+
+namespace ConsumoWCFTest
+{
+
+    class ClienteADO : IClientOps
+    {
+        
+        public Client GetClient(int id)
+        {
+            using (IDbConnection conexion = new SqlConnection(Program.GetConnection()))
+            {
+                conexion.Open();
+                var para = new DynamicParameters();
+                para.Add("ID", id);//Nombre parametro  - valor
+                var client = conexion.QuerySingle<Client>("select id, Name, Address from clients where id  = @ID", param: para, commandType: CommandType.Text);
+                return client;
+
+            }
+        }
+
+        public Client[] GetClients()
+        {
+            using (IDbConnection conexion = new SqlConnection( Program.GetConnection() ))
+            {
+                conexion.Open();
+
+                var para = new DynamicParameters();
+                para.Add("pID", 1);//Nombre parametro  - valor
+
+                var clients = conexion.Query<Client>("select id, Name, Address from clients", commandType: CommandType.Text);
+                return clients.ToArray();
+
+            }
+        }
+
+        public Client SetClient(Client pCliente)
+        {
+            using (IDbConnection conexion = new SqlConnection(Program.GetConnection()))
+            {
+               // conexion.Update(new Client()); 
+                return pCliente;
+
+            }
+        }
+       
+    }
+}
