@@ -1,0 +1,17 @@
+     Dim cte_Cartera = (From c In db.CXCTRANSAX
+                                       Join cv In db.MtoTra_VYM_Ventas_ClienteVendedor On c.no_cte Equals cv.ClienteVendedorID
+                                       Join v In db.MtoCat_VYM_Ventas_Vendedor On cv.VendedorID Equals v.VendedorID
+                                       Where v.InfoSucursalID <> pInfoSucursalID _
+                                And Not listReferencia.Contains(cv.ReferenciaBancaria)
+                                       Group c, cv By c.aplicado_a, c.serie_aplicado_a, cv.VendedorID, cv.ClienteID, cv.ReferenciaBancaria
+                                Into GrupoFacturas = Group, Monto = Sum(c.monto_1 + c.monto_2)
+                                       Where Monto > 1
+                                       Select New Facturas.dtoCartera With {
+                                    .Aplicado_A = aplicado_a,
+                                    .ClienteID = ClienteID,
+                                    .ReferenciaBancia = ReferenciaBancaria,
+                                    .Serie_aplicado_a = serie_aplicado_a,
+                                    .VendedorID = VendedorID,
+                                    .Monto = Monto
+                                    }
+                                )
