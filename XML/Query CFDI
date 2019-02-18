@@ -1,0 +1,20 @@
+	;
+		with cte_facturas as (
+		Select F.gastoid, 
+			   MAX(m.c.value('(@TasaOCuota)[1]','decimal(4,2)')) iva,
+			   G.ConceptoID
+		FROM  fyc.Tra_CreditoCobranza_CorteCajaFacturas F with (nolock)
+				join fyc.Tra_CreditoCobranza_CorteCajaGastos G on G.GastoID = F.GastoID
+				cross apply  f.XMLGasto.nodes(
+												'declare namespace cfdi="http://www.sat.gob.mx/cfd/3";
+											 /cfdi:Comprobante/cfdi:Impuestos/cfdi:Traslados/cfdi:Traslado')  as m(c)
+		
+		where G.FechaCorte= convert(datetime, @Fecha, 103) 
+             and G.ConceptoID <> 189 
+			 group by F.gastoid,G.ConceptoID 
+		)
+
+		insert into @CorteCaja_IVAGastos
+		Select GastoID,  ConceptoID,case iva * 100.0 when 16 then '000001' when 8 then '000002' end Seg4
+		from cte_facturas FG
+		where iva>0
