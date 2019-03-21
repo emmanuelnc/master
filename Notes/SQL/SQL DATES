@@ -1,0 +1,12 @@
+-- first day of the previous month
+SELECT DATEADD(MM,DATEDIFF(MM,0,GETDATE()) -1,0)
+--last day of the previous month:
+SELECT DATEADD(DAY,-(DAY(GETDATE())),GETDATE())
+-- first day of the current month
+SELECT DATEADD(mm, DATEDIFF(mm, 0, GETDATE()), 0)
+--last day of the current month:
+SELECT DATEADD (dd, -1, DATEADD(mm, DATEDIFF(mm, 0, GETDATE()) + 1, 0))
+ --first day of the next month:
+ SELECT DATEADD(mm, DATEDIFF(mm, 0, GETDATE()) + 1, 0)
+ --last day of the next month:
+SELECT DATEADD (dd, -1, DATEADD(mm, DATEDIFF(mm, 0, GETDATE()) + 2, 0))
