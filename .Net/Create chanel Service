@@ -1,0 +1,73 @@
+ Public Shared Function getPACWebService() As com.sf.ws.Timbrado.TimbradoPortType
+        Try
+
+            Dim timbraWS As com.sf.ws.Timbrado.TimbradoPortType
+
+            Dim endPointAddr As String = String.Empty
+            If clsConfig.pProduccion Then
+                endPointAddr = "https://solucionfactible.com/ws/services/Timbrado.TimbradoHttpsSoap11Endpoint/"
+
+            Else
+                endPointAddr = "http://testing.solucionfactible.com/ws/services/Timbrado.TimbradoHttpSoap11Endpoint/"
+            End If
+
+            Dim tcpBinding As BasicHttpBinding = New BasicHttpBinding()
+            'Dim tcpBinding As NetTcpBinding = New NetTcpBinding()
+            Dim EndpointAddress As EndpointAddress = New EndpointAddress(endPointAddr)
+            'tcpBinding.TransactionFlow = True
+
+
+
+            '            tcpBinding.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign
+            tcpBinding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows
+            tcpBinding.Security.Mode = SecurityMode.None
+            tcpBinding.MaxReceivedMessageSize = 65536
+            tcpBinding.CloseTimeout = New TimeSpan(0, 10, 0)
+            tcpBinding.OpenTimeout = New TimeSpan(0, 1, 0)
+            tcpBinding.ReceiveTimeout = New TimeSpan(0, 1, 0)
+            tcpBinding.SendTimeout = New TimeSpan(0, 1, 0)
+
+
+
+
+
+            Dim x As System.Xml.XmlDictionaryReaderQuotas = New System.Xml.XmlDictionaryReaderQuotas '//5MB
+
+            x.MaxDepth = 32
+            x.MaxStringContentLength = 8192
+            x.MaxArrayLength = 16384
+            x.MaxBytesPerRead = 4096
+            x.MaxNameTableCharCount = 16384
+
+            tcpBinding.ReaderQuotas = x
+
+
+            timbraWS = ChannelFactory(Of com.sf.ws.Timbrado.TimbradoPortType).CreateChannel(tcpBinding, EndpointAddress)
+
+
+
+            'Dim factory As ChannelFactory(Of com.sf.ws.Timbrado.TimbradoPortType)
+            'factory = New ChannelFactory(Of com.sf.ws.Timbrado.TimbradoPortType)(tcpBinding, EndpointAddress)
+
+            'Dim timbraWS1 = factory.CreateChannel()  '.CreateChannel(Of com.sf.ws.Timbrado.TimbradoPortType)(tcpBinding, EndpointAddress)
+
+            'timbraWS1.timbrar(Nothing)
+
+            'Dim factory2 As ChannelFactory(Of com.sf.ws.Timbrado.TimbradoPortTypeChannel)
+            'factory2 = New ChannelFactory(Of com.sf.ws.Timbrado.TimbradoPortTypeChannel)(tcpBinding, EndpointAddress)
+
+            'Dim f2 = factory2.CreateChannel()
+            'f2.timbrar()
+
+
+            'timbraWS.ChannelFactory.CreateChannel(tcpBinding, EndpointAddress)
+
+
+            'Dim xx As com.sf.ws.Timbrado.TimbradoPortType = New com.sf.ws.Timbrado.TimbradoPortTypeClient()
+            'Dim yy As com.sf.ws.Timbrado.TimbradoPortTypeChannel
+            Return timbraWS
+
+        Catch ex As Exception
+            Throw ex
+        End Try
+    End Function
