@@ -1,0 +1,24 @@
+USE DEUS
+GO
+WHILE 1= 1
+BEGIN
+       WAITFOR DELAY '00:00:10'
+       PRINT '@@ROWCOUNT: ' + CAST(@@ROWCOUNT AS VARCHAR(10));
+       WITH CTE_Prueba AS
+       (
+          SELECT top 500 cc.ContactoID
+          FROM dbo.MtoTra_VYM_Ventas_ClienteVendedor AS cv WITH (nolock) 
+          JOIN dbo.MtoCat_VYM_Ventas_Cliente AS c WITH (nolock) ON c.ClienteID = cv.ClienteID 
+          JOIN dbo.MtoCat_VYM_Ventas_Vendedor AS v WITH (nolock) ON v.VendedorID = cv.VendedorID 
+          JOIN vym.MtoTra_Ventas_ClienteVendedorContacto cvc on cvc.ClienteVendedorID = cv.ClienteVendedorID
+          JOIN MtoTra_VYM_Ventas_Contactos cc on cc.ContactoID = cvc.ContactoID
+          WHERE --v.InfoSucursalID = 18
+             c.Status = 1
+             and Telefonos.exist('/Telefonos/Telefono/Prefijo') = 1
+       )
+       UPDATE  ct with(rowlock)
+       set Telefonos.modify('delete /Telefonos/Telefono/Prefijo')  
+       from MtoTra_VYM_Ventas_Contactos ct
+       join cte_prueba tmpC on tmpC.ContactoID = ct.ContactoID
+       IF @@ROWCOUNT < 1 BREAK
+END
