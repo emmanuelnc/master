@@ -1,0 +1,20 @@
+declare @XMLtoFind as xml
+
+set @xmltofind = '<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfDepositosIdentificacion xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<DepositosIdentificacion>
+		<DepositoID>7904928</DepositoID>
+		<Busqueda>1234456</Busqueda>
+	</DepositosIdentificacion>
+		<DepositosIdentificacion>
+		<DepositoID>28</DepositoID>
+		<Busqueda>44996</Busqueda>
+	</DepositosIdentificacion>
+</ArrayOfDepositosIdentificacion>'
+
+
+select 
+	a.b.value('(DepositoID)[1]','varchar(10)') DepositoID
+	,a.b.value('(Busqueda)[1]','varchar(10)') Documento
+from  
+@xmltofind.nodes('/ArrayOfDepositosIdentificacion/DepositosIdentificacion') a(b)
