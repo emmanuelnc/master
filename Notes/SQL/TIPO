@@ -1,0 +1,4 @@
+--UNIQUE Index 
+  CREATE UNIQUE NONCLUSTERED INDEX idx_operation_number_FolioPagoTarjeta
+  ON CXCDEPOSITOSPAGOS(operation_number)
+  WHERE operation_number IS NOT NULL;
