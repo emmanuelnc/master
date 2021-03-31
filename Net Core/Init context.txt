@@ -3,3 +3,6 @@ instalar herramienta de entity
 	Microsoft.EntityFrameworkCore.SqlServer
 Mapear	
 	Scaffold-DbContext "Server=Server\Instance;Database=MyDB;User ID=user;Password=pass;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models  -Tables dbo.Table1
+
+
+https://docs.microsoft.com/es-es/ef/core/managing-schemas/scaffolding?tabs=dotnet-core-cli
