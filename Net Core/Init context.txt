@@ -1,0 +1,5 @@
+instalar herramienta de entity
+	Install-Package Microsoft.EntityFrameworkCore.Tools 
+	Microsoft.EntityFrameworkCore.SqlServer
+Mapear	
+	Scaffold-DbContext "Server=Server\Instance;Database=MyDB;User ID=user;Password=pass;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models  -Tables dbo.Table1
