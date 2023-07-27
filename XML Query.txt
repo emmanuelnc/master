@@ -1,0 +1,17 @@
+--select top 1 *
+--from Tra_VYM_Ventas_Factura
+--order by Fecha desc
+
+;WITH XMLNAMESPACES('http://www.sat.gob.mx/cfd/4' AS cfdi, 'http://www.sat.gob.mx/TimbreFiscalDigital' AS tfd)
+
+select * from (
+
+select FacturaID, Serie , XMLCFDI.value('(cfdi:Comprobante/cfdi:Complemento/tfd:TimbreFiscalDigital/@UUID)[1]','varchar(50)') UUID
+, nombre, UUID UUIDBD, fecha
+from Tra_VYM_Ventas_Factura
+where 
+--facturaid = 483813 and Serie = 'TOAF'
+Fecha > '20230701' and timbrado = 1 and status = 1
+--order by Fecha desc
+) t
+where uuid is null
