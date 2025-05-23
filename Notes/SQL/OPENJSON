@@ -1,0 +1,29 @@
+declare @jsondataarray as varchar(MAX) = '[
+    {
+        "movieID": 117331,
+        "value": 41.00
+    },
+    {
+        "movieID": 95717,
+        "value": 37.00
+    },
+    {
+        "movieID": 28544,
+        "value": 35.00
+    }]'
+
+	   Select * 
+	   from OPENJSON(@jsondataarray)
+	   with (movieID INT '$.movieID',
+			 value DECIMAL(18,2) '$.value'
+			)
+
+
+declare @jsondataelement as varchar(MAX) = '
+    {
+        "movieID": 1131,
+        "value": 4100.00
+    }'
+			
+SELECT JSON_VALUE(@jsondataelement, '$.movieID[1]') AS movieID,
+       JSON_VALUE(@jsondataelement, '$.value') AS value
