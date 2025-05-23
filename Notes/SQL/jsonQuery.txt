@@ -1,0 +1,29 @@
+declare @jsondataarray as varchar(MAX) = '[
+    {
+        "cvid": 1131,
+        "monto": 400.00
+    },
+    {
+        "cvid": 17,
+        "monto": 100.00
+    },
+    {
+        "cvid": 4,
+        "monto": 10.00
+    }]'
+
+	   Select * 
+	   from OPENJSON(@jsondataarray)
+	   with (cvid INT '$.cvid',
+			 monto DECIMAL(18,2) '$.monto'
+			)
+
+
+declare @jsondataelement as varchar(MAX) = '
+    {
+        "cvid": 31,
+        "monto": 20.00
+    }'
+			
+SELECT JSON_VALUE(@jsondataelement, '$.cvid[1]') AS cvid,
+       JSON_VALUE(@jsondataelement, '$.monto') AS monto
